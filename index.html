@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SnakeTrade</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0816;--bg2:#110b1e;--bg3:#160f24;--grid:rgba(180,80,200,0.06);--grid2:rgba(180,80,200,0.14);--accent:#c24cdb;--pink:#e8389e;--pinkG:rgba(232,56,158,0.4);--green:#34d399;--red:#fb7185;--yel:#e8e44e;--yelD:#2a2800;--txt:#e0dae8;--txt2:#8a7da0;--txt3:#5a4d70}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;touch-action:none;user-select:none}
+body{display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg2);border-bottom:1px solid var(--grid2);z-index:20;flex-shrink:0;min-height:40px}
+.pb{display:flex;align-items:center;gap:6px;background:rgba(194,76,219,0.07);border:1px solid rgba(194,76,219,0.18);padding:4px 11px;border-radius:16px;font-size:12.5px;font-weight:600}
+.pdot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px rgba(74,222,128,0.5);animation:bl 2s ease-in-out infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0.4}}
+.nf{font-size:11.5px;font-weight:600;padding:3px 12px;border-radius:12px;opacity:0;transform:translateY(-3px);transition:all 0.25s;white-space:nowrap;position:absolute;left:50%;transform:translateX(-50%) translateY(-3px)}
+.nf.sh{opacity:1;transform:translateX(-50%) translateY(0)}
+.nf.w{color:var(--green);background:rgba(52,211,153,0.12)}
+.nf.l{color:var(--red);background:rgba(251,113,133,0.12)}
+.sd{font-size:13px;font-weight:700;color:var(--yel)}
+.gw{flex:1;position:relative;overflow:hidden;min-height:0}
+canvas{display:block;width:100%;height:100%}
+.pt{position:absolute;right:0;transform:translateY(-50%);background:var(--pink);color:#fff;padding:2px 7px;font-size:9.5px;font-weight:700;z-index:10;border-radius:3px 0 0 3px;box-shadow:0 0 10px var(--pinkG);transition:top 0.12s linear;letter-spacing:-0.3px}
+.bt{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 9px;background:var(--bg2);border-top:1px solid var(--grid2);flex-shrink:0;z-index:20;gap:8px}
+.ts{display:flex;align-items:center;gap:5px}
+.rd{width:9px;height:9px;border-radius:50%;background:#ef4444;box-shadow:0 0 5px rgba(239,68,68,0.5);animation:bl 1s ease-in-out infinite}
+.tt{font-size:13px;font-weight:700}
+.bs{display:flex;gap:10px;font-size:10px;color:var(--txt2)}
+.bs .sv{font-weight:700;color:var(--txt)}
+.bsl{display:flex;gap:3px;background:rgba(28,20,48,0.8);border:1px solid var(--grid2);border-radius:7px;padding:2px}
+.bo{padding:4px 9px;border-radius:5px;font-size:10.5px;font-weight:700;font-family:inherit;border:none;background:transparent;color:var(--txt3);cursor:pointer;transition:all 0.12s}
+.bo.a{background:var(--yel);color:var(--yelD);box-shadow:0 1px 6px rgba(232,228,78,0.25)}
+.ov{position:fixed;inset:0;background:rgba(13,8,22,0.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+.ov.hd{display:none}
+.oc{background:var(--bg3);border:1px solid var(--grid2);border-radius:16px;padding:26px 20px;max-width:370px;width:100%;text-align:center}
+.oc .lg{font-family:'Outfit',sans-serif;font-size:25px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,#e8e44e,#c24cdb);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.oc .sb{font-size:12.5px;color:var(--txt2);margin-bottom:18px}
+.rs{text-align:left;margin-bottom:20px}
+.rl{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--grid);font-size:11.5px;line-height:1.5;color:var(--txt2)}
+.rl:last-child{border:none}.ri{font-size:17px;flex-shrink:0}.rl strong{color:var(--txt)}
+.bg{width:100%;height:46px;border:none;border-radius:11px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--pink));color:#fff;box-shadow:0 3px 18px rgba(194,76,219,0.3);transition:transform 0.12s}
+.bg:active{transform:scale(0.97)}
+.fs{position:absolute;z-index:30;font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;pointer-events:none;animation:fu 0.9s ease-out forwards;text-shadow:0 2px 6px rgba(0,0,0,0.5)}
+.fs.fw{color:var(--green)}.fs.fl{color:var(--red)}
+@keyframes fu{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-45px) scale(1.15)}}
+  </style>
+</head>
+<body>
+<div class="hdr">
+  <div class="pb"><div class="pdot" id="pdot"></div><span id="hP">Loading...</span><span id="pStatus" style="font-size:8px;opacity:0.5;margin-left:4px"></span></div>
+  <div class="nf" id="nf"></div>
+  <div class="sd" id="sD">0 pts</div>
+</div>
+<div class="gw" id="gw">
+  <canvas id="c"></canvas>
+  <div class="pt" id="pt">$97,500.0</div>
+</div>
+<div class="bt">
+  <div class="ts"><div class="rd"></div><span class="tt" id="tm">0:00</span></div>
+  <div class="bs">
+    <span>Hits:<span class="sv" id="vH">0</span></span>
+    <span>Miss:<span class="sv" id="vM">0</span></span>
+    <span>Streak:<span class="sv" id="vS">0🔥</span></span>
+  </div>
+  <div class="bsl">
+    <button class="bo" data-p="10">10</button>
+    <button class="bo a" data-p="25">25</button>
+    <button class="bo" data-p="50">50</button>
+    <button class="bo" data-p="100">100</button>
+  </div>
+</div>
+<div class="ov" id="ov">
+  <div class="oc">
+    <div class="lg">🐍 SnakeTrade</div>
+    <div class="sb">BTC Price Prediction Game</div>
+    <div class="rs">
+      <div class="rl"><span class="ri">📈</span><span><strong>BTC price</strong> moves like a snake across a live chart.</span></div>
+      <div class="rl"><span class="ri">🎯</span><span><strong>Tap the grid</strong> to place targets where you think price goes.</span></div>
+      <div class="rl"><span class="ri">✅</span><span>Snake <strong>hits target</strong> → earn points × multiplier!</span></div>
+      <div class="rl"><span class="ri">❌</span><span>Targets <strong>expire in 30s</strong>. Missed = lose the bet.</span></div>
+      <div class="rl"><span class="ri">🔥</span><span>Build <strong>streaks</strong> for combos. Further = higher payout!</span></div>
+    </div>
+    <button class="bg" id="go">Start Playing</button>
+  </div>
+</div>
+<script>
+const C=document.getElementById('c'),X=C.getContext('2d'),GW=document.getElementById('gw');
+const CFG={rPad:62,bPad:24,pastSec:30,futureSec:45,targetLife:30,hitPct:0.035,maxT:8,microMs:50,headRatio:0.4,fetchMs:3000,rangePadPct:0.35};
+const S={score:0,hits:0,misses:0,streak:0,bet:25,targets:[],ph:[],cp:null,pMin:0,pMax:0,t0:null,running:false,lastMicro:0,lastFetch:0,dpr:1,w:0,h:0,cw:0,ch:0,anims:[],realPrice:null,velocity:0,fetchOk:false,wsConnected:false,statusText:'Connecting...',
+  // Smooth interpolation state
+  displayPrice:null,targetPrice:null,priceVel:0,
+  // Range smoothing
+  targetPMin:0,targetPMax:0,
+};
+
+// ══════════════════════════════════════
+// REAL-TIME BTC PRICE — 3 strategies:
+// 1. Binance WebSocket (real-time, free, no key)
+// 2. HTTP polling (CoinDesk/CoinGecko/Binance REST)
+// 3. Realistic simulation fallback
+// ══════════════════════════════════════
+
+let ws=null;
+function connectWS(){
+  try{
+    ws=new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+    ws.onopen=()=>{S.wsConnected=true;S.fetchOk=true;S.statusText='LIVE';};
+    ws.onmessage=(e)=>{
+      try{
+        const d=JSON.parse(e.data);
+        const p=parseFloat(d.p);
+        if(p>0)onRealPrice(p);
+      }catch{}
+    };
+    ws.onerror=()=>{S.wsConnected=false;ws=null;};
+    ws.onclose=()=>{S.wsConnected=false;ws=null;
+      // Retry in 5s
+      setTimeout(connectWS,5000);
+    };
+  }catch{S.wsConnected=false;}
+}
+
+function onRealPrice(p){
+  const now=Date.now();
+
+  // First real price arrival: wipe all sim history completely
+  if(!S.fetchOk){
+    S.ph=[];
+    S.pMin=0;S.pMax=0;
+  }
+
+  if(S.realPrice&&S.realPrice>0){
+    const raw=p-S.realPrice;
+    S.velocity=S.velocity*0.7+raw*0.3;
+    const mv=S.realPrice*0.001;
+    S.velocity=Math.max(-mv,Math.min(mv,S.velocity));
+  }
+  S.realPrice=p;
+  S.fetchOk=true;
+  S.targetPrice=p;
+  if(S.ph.length>0&&now-S.ph[S.ph.length-1].t<80)return;
+  addP(now,p);
+}
+
+// HTTP fallback polling
+async function httpFetch(){
+  const urls=[
+    {url:'https://api.coindesk.com/v1/bpi/currentprice/USD.json',parse:d=>d.bpi.USD.rate_float},
+    {url:'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',parse:d=>d.bitcoin.usd},
+    {url:'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',parse:d=>parseFloat(d.price)},
+    {url:'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD',parse:d=>d.USD},
+  ];
+  for(const {url,parse} of urls){
+    try{
+      const r=await fetch(url,{signal:AbortSignal.timeout(4000)});
+      const d=await r.json();
+      const p=parse(d);
+      if(p&&p>0)return p;
+    }catch{}
+  }
+  return null;
+}
+
+async function doFetch(){
+  if(S.wsConnected)return; // WS is handling it
+  const now=Date.now();
+  if(now-S.lastFetch<CFG.fetchMs)return;
+  S.lastFetch=now;
+  const p=await httpFetch();
+  if(p&&p>0){
+    onRealPrice(p);
+    S.statusText='LIVE (poll)';
+  }else if(!S.fetchOk){
+    S.statusText='SIMULATED';
+  }
+}
+
+// ── Realistic Simulation (fallback when APIs blocked) ──
+// Models real BTC: ~$5-15 moves per second, occasional $20-30 jumps
+let simPrice=0,simVel=0,simTrend=0,simTrendTimer=0,simVolRegime=1,simBase=97500;
+
+function initSim(base){
+  simPrice=base;simBase=base;simVel=0;
+  simTrend=(Math.random()-0.5)*0.15;
+  simTrendTimer=Date.now()+8000+Math.random()*20000;
+  simVolRegime=0.8+Math.random()*0.4;
+}
+
+function simTick(dtSec){
+  const now=Date.now();
+  dtSec=Math.min(dtSec,0.15);
+
+  if(now>simTrendTimer){
+    simTrend=(Math.random()-0.5)*0.2;
+    simTrendTimer=now+8000+Math.random()*25000;
+    simVolRegime=0.7+Math.random()*0.5;
+  }
+
+  // Gaussian noise
+  const u1=Math.random(),u2=Math.random();
+  const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
+
+  // ~$3-8 per tick at 50ms (scaled by dt)
+  const tickNoise=g*4*Math.sqrt(dtSec/0.05)*simVolRegime;
+
+  // Mean reversion to base
+  const reversion=(simBase-simPrice)*0.003*dtSec;
+
+  // Trend drift
+  const drift=simTrend*dtSec*10;
+
+  simVel=simVel*0.7+tickNoise+drift+reversion;
+
+  // Clamp velocity to ~$15 max per tick
+  simVel=Math.max(-15,Math.min(15,simVel));
+
+  // Occasional jumps ($10-25)
+  if(Math.random()<0.005){
+    simVel+=(Math.random()-0.5)*20;
+  }
+
+  simPrice+=simVel;
+
+  // Stay within ±0.3% of base (~$300 range for ~$97k BTC)
+  const maxDrift=simBase*0.003;
+  simPrice=Math.max(simBase-maxDrift,Math.min(simBase+maxDrift,simPrice));
+
+  return simPrice;
+}
+
+// ── Micro Updates — runs every ~50ms for smooth line ──
+function microUpdate(){
+  const now=Date.now();
+  if(now-S.lastMicro<CFG.microMs)return;
+  const dt=Math.min((now-S.lastMicro)/1000,0.2); // clamp dt
+  S.lastMicro=now;
+  if(!S.cp||S.ph.length<2)return;
+
+  const last=S.ph[S.ph.length-1];
+  if(now-last.t<40)return;
+
+  let newP;
+  if(S.fetchOk&&S.realPrice){
+    const target=S.targetPrice||S.realPrice;
+    const gap=target-last.p;
+    const smoothing=0.3;
+    const drift=gap*smoothing;
+    const volScale=Math.max(Math.abs(S.velocity)*0.3,S.realPrice*0.000012);
+    const u1=Math.random(),u2=Math.random();
+    const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
+    newP=last.p+drift+g*volScale;
+  }else{
+    newP=simTick(dt);
+  }
+
+  // Sanity check — never let price go negative or insane
+  if(!isFinite(newP)||newP<=0)newP=last.p;
+
+  S.ph.push({t:now,p:newP});
+  S.cp=newP;
+  S.displayPrice=newP;
+  if(S.ph.length>2000)S.ph.shift();
+
+  // Auto-zoom: use only recent 10s for Y-range — ultra tight
+  const rangeWindow=10000;
+  const cutT=now-rangeWindow;
+  let rMn=newP,rMx=newP;
+  for(let i=S.ph.length-1;i>=0;i--){
+    if(S.ph[i].t<cutT)break;
+    if(S.ph[i].p<rMn)rMn=S.ph[i].p;
+    if(S.ph[i].p>rMx)rMx=S.ph[i].p;
+  }
+  const rng=rMx-rMn;
+  // $1 move should span ~4 rows out of ~10 visible = $2.5 total range
+  // minRange=$3 means the chart shows $3 minimum, so $1 = 3-4 blocks
+  const minRange=3;
+  const visRange=Math.max(rng,minRange);
+  const pad=visRange*0.25;
+  const center=(rMn+rMx)/2;
+  S.targetPMin=center-visRange/2-pad;
+  S.targetPMax=center+visRange/2+pad;
+  S.pMin+=(S.targetPMin-S.pMin)*0.1;
+  S.pMax+=(S.targetPMax-S.pMax)*0.1;
+
+  document.getElementById('hP').textContent='$'+newP.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function addP(t,p){
+  S.cp=p;S.ph.push({t,p});
+  const cut=Date.now()-(CFG.pastSec+30)*1000;
+  while(S.ph.length>0&&S.ph[0].t<cut)S.ph.shift();
+  updateRange();
+  document.getElementById('hP').textContent='$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  checkT();
+}
+
+function updateRange(){
+  if(S.ph.length<2)return;
+  const now=Date.now(),cutT=now-10000;
+  let mn=S.cp||S.ph[S.ph.length-1].p,mx=mn;
+  for(let i=S.ph.length-1;i>=0;i--){
+    if(S.ph[i].t<cutT)break;
+    if(S.ph[i].p<mn)mn=S.ph[i].p;
+    if(S.ph[i].p>mx)mx=S.ph[i].p;
+  }
+  const rng=mx-mn;
+  const minRange=3;
+  const visRange=Math.max(rng,minRange);
+  const pad=visRange*0.25;
+  const center=(mn+mx)/2;
+  S.targetPMin=center-visRange/2-pad;
+  S.targetPMax=center+visRange/2+pad;
+  if(S.pMin===0&&S.pMax===0){S.pMin=S.targetPMin;S.pMax=S.targetPMax;}
+}
+
+function p2y(p){return S.pMax<=S.pMin?S.ch/2:S.ch*(1-(p-S.pMin)/(S.pMax-S.pMin))}
+function y2p(y){return S.pMin+(1-y/S.ch)*(S.pMax-S.pMin)}
+
+// Frame-stable timestamp: set once per frame to prevent jitter
+let frameNow=Date.now();
+
+function t2x(t){
+  const headX=S.cw*CFG.headRatio;
+  const dt=(t-frameNow)/1000;
+  if(dt<=0){
+    return headX+dt*(headX/CFG.pastSec);
+  }else{
+    return headX+dt*((S.cw-headX)/CFG.futureSec);
+  }
+}
+function x2t(x){
+  const headX=S.cw*CFG.headRatio;
+  if(x<=headX){
+    const dt=(x-headX)*(CFG.pastSec/headX);
+    return frameNow+dt*1000;
+  }else{
+    const dt=(x-headX)*(CFG.futureSec/(S.cw-headX));
+    return frameNow+dt*1000;
+  }
+}
+
+function resize(){
+  const r=GW.getBoundingClientRect();
+  S.dpr=window.devicePixelRatio||1;S.w=r.width;S.h=r.height;
+  C.width=S.w*S.dpr;C.height=S.h*S.dpr;
+  C.style.width=S.w+'px';C.style.height=S.h+'px';
+  X.setTransform(S.dpr,0,0,S.dpr,0,0);
+  S.cw=S.w-CFG.rPad;S.ch=S.h-CFG.bPad;
+}
+
+function fmtP(p){
+  const range=S.pMax-S.pMin;
+  if(range<10)return p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(range<50)return p.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+  return p>=1000?p.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):p.toFixed(0);
+}
+
+function drawGrid(){
+  const range=S.pMax-S.pMin;if(range<=0)return;
+  let step=0.25;
+  if(range>2)step=0.5;
+  if(range>5)step=1;
+  if(range>12)step=2;
+  if(range>25)step=5;
+  if(range>80)step=10;if(range>200)step=25;if(range>500)step=50;
+  if(range>1200)step=100;if(range>3000)step=250;if(range>7000)step=500;if(range>15000)step=1000;
+  const sp=Math.ceil(S.pMin/step)*step;
+  X.textAlign='right';X.textBaseline='middle';
+  for(let p=sp;p<=S.pMax;p+=step){
+    const y=p2y(p);if(y<-2||y>S.ch+2)continue;
+    const m=Math.abs(p%(step*4))<step*0.1;
+    X.strokeStyle=m?'rgba(180,80,200,0.12)':'rgba(180,80,200,0.05)';
+    X.lineWidth=0.5;X.beginPath();X.moveTo(0,y);X.lineTo(S.cw,y);X.stroke();
+    X.fillStyle=m?'rgba(160,130,190,0.55)':'rgba(140,115,170,0.3)';
+    X.font='500 '+(m?'9.5':'8.5')+'px "JetBrains Mono"';
+    X.fillText('$'+fmtP(p),S.w-3,y);
+  }
+  const now=Date.now(),tS=15000,tStart=now-CFG.pastSec*1000,tEnd=now+CFG.futureSec*1000;
+  const ft=Math.ceil(tStart/tS)*tS;
+  X.textAlign='center';X.textBaseline='top';
+  for(let t=ft;t<=tEnd;t+=tS){
+    const x=t2x(t);if(x<-2||x>S.cw+2)continue;
+    X.strokeStyle=t%60000===0?'rgba(180,80,200,0.12)':'rgba(180,80,200,0.04)';
+    X.lineWidth=0.5;X.beginPath();X.moveTo(x,0);X.lineTo(x,S.ch);X.stroke();
+    const d=new Date(t);
+    X.fillStyle='rgba(140,115,170,0.28)';X.font='8.5px "JetBrains Mono"';
+    X.fillText(d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}),x,S.ch+6);
+  }
+}
+
+function drawHeat(){
+  if(!S.cp)return;const range=S.pMax-S.pMin;if(range<=0)return;
+  const cols=Math.max(6,Math.floor(S.cw/72)),rows=Math.max(5,Math.floor(S.ch/48));
+  const cw=S.cw/cols,ch=S.ch/rows;
+  const headX=S.cw*CFG.headRatio;
+  X.textAlign='center';X.textBaseline='middle';X.font='500 8.5px "JetBrains Mono"';
+  for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){
+    const cx=c*cw+cw/2,cy=r*ch+ch/2,cellP=y2p(cy);
+    const pDiff=Math.abs(cellP-S.cp),dr=pDiff/range;
+    // Time factor: cells ahead of the head get a boost
+    const timeFactor=cx>headX?1+((cx-headX)/(S.cw-headX))*0.3:1;
+    const mult=(1+dr*12*timeFactor).toFixed(1);
+    const alpha=0.08+Math.min(dr*2,1)*0.3;
+    X.fillStyle=`rgba(170,90,220,${alpha})`;X.fillText(mult+'X',cx,cy);
+  }}
+}
+
+function drawLine(){
+  const pts=S.ph;if(pts.length<3)return;
+
+  // Downsample: with 50ms updates we get ~20pts/sec, 80sec past = ~1600pts
+  // Draw every Nth point, but keep recent ones dense
+  const now=Date.now();
+  const visible=[];
+  for(let i=0;i<pts.length;i++){
+    const x=t2x(pts[i].t);
+    if(x<-50)continue;if(x>S.cw+50)break;
+    const age=now-pts[i].t;
+    // Recent 5s: every point. 5-20s: every 2nd. 20s+: every 4th
+    if(age<5000||i%2===0&&age<20000||i%4===0){
+      visible.push(pts[i]);
+    }
+  }
+  if(visible.length<3)return;
+
+  // Convert to screen coords
+  const sc=visible.map(p=>({x:t2x(p.t),y:p2y(p.p)}));
+
+  // Area fill under curve — very subtle
+  X.beginPath();
+  drawCatmullRomPath(sc);
+  X.lineTo(sc[sc.length-1].x,S.ch);
+  X.lineTo(sc[0].x,S.ch);
+  X.closePath();
+  const ag=X.createLinearGradient(0,0,0,S.ch);
+  ag.addColorStop(0,'rgba(194,76,219,0.03)');ag.addColorStop(1,'rgba(194,76,219,0)');
+  X.fillStyle=ag;X.fill();
+
+  // Main line — old portion (dimmer)
+  const splitIdx=Math.max(0,sc.length-40);
+  if(splitIdx>2){
+    X.beginPath();
+    drawCatmullRomPath(sc.slice(0,splitIdx+1));
+    X.save();X.shadowColor='rgba(200,190,230,0.15)';X.shadowBlur=4;
+    X.strokeStyle='rgba(200,195,220,0.55)';X.lineWidth=1.6;X.lineJoin='round';X.lineCap='round';
+    X.stroke();X.restore();
+  }
+
+  // Bright tip — recent portion
+  const tipPts=sc.slice(Math.max(0,splitIdx-1));
+  if(tipPts.length>=2){
+    X.beginPath();
+    drawCatmullRomPath(tipPts);
+    X.save();X.shadowColor='rgba(255,255,255,0.5)';X.shadowBlur=10;
+    X.strokeStyle='#fffdf5';X.lineWidth=2.2;X.lineJoin='round';X.lineCap='round';
+    X.stroke();X.restore();
+  }
+
+  // Head
+  const last=sc[sc.length-1];
+  const hx=last.x,hy=last.y;
+  const hg=X.createRadialGradient(hx,hy,0,hx,hy,14);
+  hg.addColorStop(0,'rgba(255,255,255,0.4)');hg.addColorStop(1,'rgba(194,76,219,0)');
+  X.fillStyle=hg;X.beginPath();X.arc(hx,hy,14,0,Math.PI*2);X.fill();
+  X.fillStyle='#fff';X.beginPath();X.arc(hx,hy,3.5,0,Math.PI*2);X.fill();
+
+  // 'Now' vertical guide
+  X.strokeStyle='rgba(232,56,158,0.1)';X.lineWidth=0.6;
+  X.beginPath();X.moveTo(hx,0);X.lineTo(hx,S.ch);X.stroke();
+
+  // Dashed line from head to right edge
+  X.setLineDash([4,4]);X.strokeStyle='rgba(232,56,158,0.28)';X.lineWidth=0.6;
+  X.beginPath();X.moveTo(hx,hy);X.lineTo(S.cw,hy);X.stroke();X.setLineDash([]);
+}
+
+// Catmull-Rom spline through points — much smoother than lineTo
+function drawCatmullRomPath(pts,tension){
+  tension=tension||0.35;
+  if(pts.length<2)return;
+  X.moveTo(pts[0].x,pts[0].y);
+  if(pts.length===2){X.lineTo(pts[1].x,pts[1].y);return;}
+
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[Math.max(0,i-1)];
+    const p1=pts[i];
+    const p2=pts[Math.min(pts.length-1,i+1)];
+    const p3=pts[Math.min(pts.length-1,i+2)];
+
+    const cp1x=p1.x+(p2.x-p0.x)*tension;
+    const cp1y=p1.y+(p2.y-p0.y)*tension;
+    const cp2x=p2.x-(p3.x-p1.x)*tension;
+    const cp2y=p2.y-(p3.y-p1.y)*tension;
+
+    X.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
+  }
+}
+
+function rr(c,x,y,w,h,r){
+  c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);c.lineTo(x+r,y+h);
+  c.arcTo(x,y+h,x,y+h-r,r);c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
+}
+
+function drawTargets(){
+  const now=Date.now();
+  S.targets.forEach(tgt=>{
+    if(tgt.done)return;
+    const x=t2x(tgt.t),y=p2y(tgt.p);
+    if(x<-60||x>S.cw+60||y<-60||y>S.ch+60)return;
+    const el=now-tgt.at,life=Math.max(0,1-el/(CFG.targetLife*1000));
+    if(life<=0){resolveT(tgt,false);return}
+    const bw=44,bh=36,bx=x-bw/2,by=y-bh/2;
+
+    X.save();X.shadowColor='rgba(232,228,78,0.28)';X.shadowBlur=12;
+    X.fillStyle=`rgba(232,228,78,${0.82+Math.sin(now/350)*0.07})`;
+    rr(X,bx,by,bw,bh,5);X.fill();X.restore();
+
+    X.strokeStyle='rgba(200,190,50,0.3)';X.lineWidth=0.7;rr(X,bx,by,bw,bh,5);X.stroke();
+
+    X.fillStyle='#2a2800';X.textAlign='center';X.textBaseline='middle';
+    X.font='bold 12.5px "JetBrains Mono"';X.fillText(tgt.pts+'pt',x,y-4);
+    X.font='600 8.5px "JetBrains Mono"';X.fillStyle='rgba(42,40,0,0.55)';
+    X.fillText(tgt.mult.toFixed(2)+'X',x,y+9);
+
+    X.strokeStyle=`rgba(255,255,255,${0.15+life*0.35})`;X.lineWidth=1.8;
+    X.beginPath();X.arc(x,y,27,-Math.PI/2,-Math.PI/2+Math.PI*2*life);X.stroke();
+  });
+}
+
+function drawAnims(){
+  const now=Date.now();
+  for(let i=S.anims.length-1;i>=0;i--){
+    const a=S.anims[i],age=now-a.st;
+    if(age>700){S.anims.splice(i,1);continue}
+    const pr=age/700,al=1-pr,x=t2x(a.t),y=p2y(a.p);
+    if(a.hit){
+      X.strokeStyle=`rgba(52,211,153,${al})`;X.lineWidth=2;
+      X.beginPath();X.arc(x,y,18+pr*25,0,Math.PI*2);X.stroke();
+      X.strokeStyle=`rgba(52,211,153,${al*0.4})`;
+      X.beginPath();X.arc(x,y,10+pr*40,0,Math.PI*2);X.stroke();
+    }else{
+      X.strokeStyle=`rgba(251,113,133,${al})`;X.lineWidth=2.5;
+      const s=10+pr*8;X.beginPath();
+      X.moveTo(x-s,y-s);X.lineTo(x+s,y+s);X.moveTo(x+s,y-s);X.lineTo(x-s,y+s);X.stroke();
+    }
+  }
+}
+
+function draw(){
+  frameNow=Date.now(); // snapshot time for this frame — prevents jitter
+  X.clearRect(0,0,S.w,S.h);
+  const bg=X.createLinearGradient(0,0,0,S.h);
+  bg.addColorStop(0,'#0f091f');bg.addColorStop(1,'#0a0614');
+  X.fillStyle=bg;X.fillRect(0,0,S.w,S.h);
+  X.save();X.beginPath();X.rect(0,0,S.cw,S.ch);X.clip();
+  drawGrid();drawHeat();drawTargets();drawAnims();drawLine();
+  X.restore();
+  X.strokeStyle='rgba(180,80,200,0.16)';X.lineWidth=0.7;
+  X.beginPath();X.moveTo(S.cw,0);X.lineTo(S.cw,S.ch);X.stroke();
+  X.beginPath();X.moveTo(0,S.ch);X.lineTo(S.w,S.ch);X.stroke();
+
+  if(S.cp){
+    const py=p2y(S.cp),tag=document.getElementById('pt'),wh=GW.getBoundingClientRect().height;
+    tag.style.top=Math.max(8,Math.min(wh-16,(py/S.h)*wh))+'px';
+    tag.textContent='$'+S.cp.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+  }
+}
+
+// ── Price + Target Logic ── (addP, microUpdate, updateRange defined above)
+
+function placeT(cx,cy){
+  const ac=S.targets.filter(t=>!t.done).length;
+  if(ac>=CFG.maxT){showN('Max '+CFG.maxT+' targets!',true);return}
+  if(S.ph.length<5){showN('Waiting for data...',true);return}
+  const rect=GW.getBoundingClientRect(),lx=cx-rect.left,ly=cy-rect.top;
+  if(lx>S.cw||ly>S.ch||lx<0||ly<0)return;
+  frameNow=Date.now(); // update for accurate x2t
+  const price=y2p(ly),time=x2t(lx),now=frameNow;
+  if(time<now-5000){showN('Tap to the right of the line!',true);return}
+  const range=S.pMax-S.pMin,diff=Math.abs(price-S.cp),dr=diff/range;
+  const mult=Math.max(1.05,1+dr*13);
+  S.targets.push({id:now+Math.random(),p:price,t:Math.max(time,now),pts:S.bet,mult:Math.round(mult*100)/100,at:now,done:false});
+  if(navigator.vibrate)navigator.vibrate(20);
+}
+
+function checkT(){
+  const now=Date.now();if(!S.cp)return;
+  const range=S.pMax-S.pMin;
+  if(range<=0)return;
+  const thresh=range*CFG.hitPct;
+
+  S.targets.forEach(tgt=>{
+    if(tgt.done)return;
+    // Expired?
+    if(now-tgt.at>CFG.targetLife*1000){resolveT(tgt,false);return}
+    // Hit = price is within threshold of target price. That's it.
+    if(Math.abs(S.cp-tgt.p)<=thresh){
+      resolveT(tgt,true);
+    }
+  });
+}
+
+function resolveT(tgt,hit){
+  tgt.done=true;S.anims.push({t:tgt.t,p:tgt.p,hit,st:Date.now()});
+  if(hit){
+    const earned=Math.round(tgt.pts*tgt.mult);
+    S.score+=earned;S.hits++;S.streak++;
+    showN('🎉 You won '+earned+'pts!',false);
+    showFloat(tgt,'+'+earned,true);
+    if(navigator.vibrate)navigator.vibrate([15,30,15]);
+  }else{
+    S.score-=tgt.pts;S.misses++;S.streak=0;
+    showN('❌ Lost '+tgt.pts+'pts',true);
+    showFloat(tgt,'-'+tgt.pts,false);
+    if(navigator.vibrate)navigator.vibrate(70);
+  }
+  updS();
+  setTimeout(()=>{S.targets=S.targets.filter(x=>x.id!==tgt.id)},800);
+}
+
+function updS(){
+  document.getElementById('sD').textContent=S.score+' pts';
+  document.getElementById('vH').textContent=S.hits;
+  document.getElementById('vM').textContent=S.misses;
+  document.getElementById('vS').textContent=S.streak+'🔥';
+}
+
+function updTm(){
+  if(!S.t0)return;
+  const e=Math.floor((Date.now()-S.t0)/1000);
+  document.getElementById('tm').textContent=Math.floor(e/60)+':'+(e%60).toString().padStart(2,'0');
+}
+
+let _nt;
+function showN(msg,lose){
+  const el=document.getElementById('nf');el.textContent=msg;
+  el.className='nf sh '+(lose?'l':'w');clearTimeout(_nt);
+  _nt=setTimeout(()=>el.classList.remove('sh'),2200);
+}
+
+function showFloat(tgt,txt,win){
+  const rect=GW.getBoundingClientRect();
+  const x=t2x(tgt.t),y=p2y(tgt.p);
+  const sx=rect.left+(x/S.w)*rect.width,sy=rect.top+(y/S.h)*rect.height;
+  const el=document.createElement('div');el.className='fs '+(win?'fw':'fl');
+  el.textContent=txt;el.style.left=sx+'px';el.style.top=sy+'px';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),900);
+}
+
+// ── Events ──
+GW.addEventListener('click',e=>{if(!S.running)return;placeT(e.clientX,e.clientY)});
+GW.addEventListener('touchstart',e=>{if(!S.running)return;e.preventDefault();placeT(e.touches[0].clientX,e.touches[0].clientY)},{passive:false});
+document.querySelectorAll('.bo').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.bo').forEach(x=>x.classList.remove('a'));b.classList.add('a');S.bet=parseInt(b.dataset.p)})});
+document.getElementById('go').addEventListener('click',()=>{document.getElementById('ov').classList.add('hd');S.t0=Date.now();S.running=true});
+window.addEventListener('resize',resize);
+
+// ── Loop ──
+let _statusTimer=0;
+function loop(){
+  if(S.running){
+    doFetch();microUpdate();updTm();checkT();
+    const now=Date.now();
+    if(now-_statusTimer>3000){_statusTimer=now;updateStatusUI();}
+  }
+  draw();requestAnimationFrame(loop);
+}
+
+// ── Init ──
+resize();
+
+async function init(){
+  let basePrice=null;
+
+  // 1. Try HTTP fetch first to get a starting price
+  const httpP=await httpFetch();
+  if(httpP&&httpP>0){
+    basePrice=httpP;
+    S.realPrice=httpP;
+    S.fetchOk=true;
+    S.statusText='LIVE';
+  }
+
+  // 2. Try WebSocket for real-time stream
+  connectWS();
+
+  // 3. Fallback to simulation if no API works
+  if(!basePrice){
+    // Use a recent realistic BTC price as base
+    basePrice=97500+Math.random()*200;
+    S.statusText='SIMULATED';
+  }
+
+  initSim(basePrice);
+
+  // Seed history — dense points, realistic $5-15 moves
+  const n=Date.now();
+  let p=basePrice;
+  let v=0;
+  const seedCount=CFG.pastSec*20;
+  const seedInterval=CFG.pastSec*1000/seedCount;
+  const maxSeedDrift=basePrice*0.003; // ±0.3%
+
+  for(let i=seedCount;i>=0;i--){
+    const u1=Math.random(),u2=Math.random();
+    const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
+    v=v*0.7+g*3; // ~$3 noise per tick
+    v=Math.max(-12,Math.min(12,v));
+    p+=v;
+    p+=(basePrice-p)*0.003;
+    p=Math.max(basePrice-maxSeedDrift,Math.min(basePrice+maxSeedDrift,p));
+    S.ph.push({t:n-i*seedInterval,p});
+  }
+  if(S.ph.length>0)S.ph[S.ph.length-1].p=basePrice;
+  S.cp=basePrice;S.displayPrice=basePrice;S.targetPrice=basePrice;
+  updateRange();
+  S.pMin=S.targetPMin;S.pMax=S.targetPMax;
+
+  // Update UI
+  document.getElementById('hP').textContent='$'+basePrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  updateStatusUI();
+  draw();loop();
+}
+
+function updateStatusUI(){
+  const dot=document.getElementById('pdot');
+  const st=document.getElementById('pStatus');
+  if(S.wsConnected){
+    dot.style.background='#4ade80';
+    dot.style.boxShadow='0 0 5px rgba(74,222,128,0.5)';
+    st.textContent='LIVE';st.style.color='#4ade80';
+  }else if(S.fetchOk){
+    dot.style.background='#facc15';
+    dot.style.boxShadow='0 0 5px rgba(250,204,21,0.5)';
+    st.textContent='POLL';st.style.color='#facc15';
+  }else{
+    dot.style.background='#fb923c';
+    dot.style.boxShadow='0 0 5px rgba(251,146,60,0.5)';
+    st.textContent='SIM';st.style.color='#fb923c';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "SnakeTrade — BTC Price Game",
+  "short_name": "SnakeTrade",
+  "description": "Predict BTC price movements in this snake-inspired trading game",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0816",
+  "theme_color": "#0d0816"
+}
