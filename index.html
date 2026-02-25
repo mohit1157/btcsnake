@@ -44,24 +44,71 @@ canvas{display:block;width:100%;height:100%}
 .fs{position:absolute;z-index:30;font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;pointer-events:none;animation:fu 0.9s ease-out forwards;text-shadow:0 2px 6px rgba(0,0,0,0.5)}
 .fs.fw{color:var(--green)}.fs.fl{color:var(--red)}
 @keyframes fu{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-45px) scale(1.15)}}
+
+/* Streak glow animations */
+@keyframes streakFire{0%,100%{text-shadow:0 0 6px rgba(255,160,0,0.6)}50%{text-shadow:0 0 14px rgba(255,120,0,0.9),0 0 20px rgba(255,80,0,0.4)}}
+@keyframes streakBlaze{0%,100%{text-shadow:0 0 8px rgba(255,100,0,0.7),0 0 16px rgba(255,50,0,0.4)}50%{text-shadow:0 0 20px rgba(255,60,0,1),0 0 30px rgba(255,20,0,0.6)}}
+@keyframes streakInferno{0%,100%{text-shadow:0 0 10px rgba(255,50,50,0.8),0 0 20px rgba(255,0,0,0.5),0 0 30px rgba(200,0,100,0.3)}50%{text-shadow:0 0 24px rgba(255,20,20,1),0 0 40px rgba(255,0,0,0.7),0 0 50px rgba(200,0,100,0.5)}}
+.streak-fire{animation:streakFire 0.8s ease-in-out infinite;color:#ff8c00!important}
+.streak-blaze{animation:streakBlaze 0.6s ease-in-out infinite;color:#ff4500!important}
+.streak-inferno{animation:streakInferno 0.4s ease-in-out infinite;color:#ff0040!important}
+
+/* Power-up HUD */
+.pwr-hud{display:flex;gap:6px;padding:0 12px;background:var(--bg2);border-top:1px solid var(--grid2);flex-shrink:0;z-index:20;overflow:hidden;transition:all 0.2s}
+.pwr-hud:empty{padding:0;border:none}
+.pwr-hud:not(:empty){padding:4px 12px}
+.pwr-item{display:flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pwr-2x{background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.3)}
+.pwr-shield{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)}
+.pwr-freeze{background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.3)}
+.pwr-magnet{background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.3)}
+
+/* Quick predict buttons */
+.qp{display:flex;gap:5px}
+.qp-btn{padding:4px 10px;border-radius:6px;font-size:10.5px;font-weight:800;font-family:'JetBrains Mono',monospace;border:none;cursor:pointer;transition:all 0.12s;letter-spacing:-0.3px}
+.qp-btn:active{transform:scale(0.94)}
+.qp-up{background:rgba(52,211,153,0.15);color:var(--green);border:1px solid rgba(52,211,153,0.3)}
+.qp-down{background:rgba(251,113,133,0.15);color:var(--red);border:1px solid rgba(251,113,133,0.3)}
+
+/* Rank badge & progress */
+.rank-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(194,76,219,0.1);border:1px solid rgba(194,76,219,0.2);white-space:nowrap}
+.rank-bar{width:100%;height:3px;background:rgba(180,80,200,0.1);flex-shrink:0}
+.rank-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));transition:width 0.4s ease}
+
+/* High score splash */
+.hs-splash{margin-bottom:14px;padding:8px 12px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;font-size:11px;color:var(--txt2);text-align:left}
+.hs-splash .hs-val{color:#ffd700;font-weight:700}
+
+/* HS celebration overlay */
+.hs-notif{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.6),0 0 40px rgba(255,215,0,0.3);z-index:200;pointer-events:none;opacity:0;transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.3s;white-space:nowrap}
+.hs-notif.show{transform:translate(-50%,-50%) scale(1);opacity:1}
   </style>
 </head>
 <body>
 <div class="hdr">
   <div class="pb"><div class="pdot" id="pdot"></div><span id="hP">Loading...</span><span id="pStatus" style="font-size:8px;opacity:0.5;margin-left:4px"></span></div>
   <div class="nf" id="nf"></div>
-  <div class="sd" id="sD">0 pts</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="rank-badge" id="rankBadge">🌱 Newbie</div>
+    <div class="sd" id="sD">0 pts</div>
+  </div>
 </div>
+<div class="rank-bar"><div class="rank-fill" id="rankFill" style="width:0%"></div></div>
 <div class="gw" id="gw">
   <canvas id="c"></canvas>
-  <div class="pt" id="pt">$97,500.0</div>
+  <div class="pt" id="pt">$---</div>
 </div>
+<div class="pwr-hud" id="pwrHud"></div>
 <div class="bt">
   <div class="ts"><div class="rd"></div><span class="tt" id="tm">0:00</span></div>
+  <div class="qp">
+    <button class="qp-btn qp-up" id="qpUp">&#9650; UP</button>
+    <button class="qp-btn qp-down" id="qpDown">&#9660; DOWN</button>
+  </div>
   <div class="bs">
     <span>Hits:<span class="sv" id="vH">0</span></span>
     <span>Miss:<span class="sv" id="vM">0</span></span>
-    <span>Streak:<span class="sv" id="vS">0🔥</span></span>
+    <span>Streak:<span class="sv" id="vS">0</span></span>
   </div>
   <div class="bsl">
     <button class="bo" data-p="10">10</button>
@@ -74,38 +121,398 @@ canvas{display:block;width:100%;height:100%}
   <div class="oc">
     <div class="lg">🐍 SnakeTrade</div>
     <div class="sb">BTC Price Prediction Game</div>
+    <div id="hsSplash"></div>
     <div class="rs">
       <div class="rl"><span class="ri">📈</span><span><strong>BTC price</strong> moves like a snake across a live chart.</span></div>
       <div class="rl"><span class="ri">🎯</span><span><strong>Tap the grid</strong> to place targets where you think price goes.</span></div>
       <div class="rl"><span class="ri">✅</span><span>Snake <strong>hits target</strong> → earn points × multiplier!</span></div>
       <div class="rl"><span class="ri">❌</span><span>Targets <strong>expire in 30s</strong>. Missed = lose the bet.</span></div>
       <div class="rl"><span class="ri">🔥</span><span>Build <strong>streaks</strong> for combos. Further = higher payout!</span></div>
+      <div class="rl"><span class="ri">⚡</span><span>Collect <strong>power-ups</strong> on the chart for special abilities!</span></div>
+      <div class="rl"><span class="ri">🎮</span><span>Use <strong>▲ UP / ▼ DOWN</strong> buttons for quick predictions!</span></div>
     </div>
     <button class="bg" id="go">Start Playing</button>
   </div>
 </div>
+<div class="hs-notif" id="hsNotif">NEW HIGH SCORE!</div>
 <script>
 const C=document.getElementById('c'),X=C.getContext('2d'),GW=document.getElementById('gw');
-const CFG={rPad:62,bPad:24,pastSec:30,futureSec:45,targetLife:30,hitPct:0.035,maxT:8,microMs:50,headRatio:0.4,fetchMs:3000,rangePadPct:0.35};
+const CFG={rPad:62,bPad:24,pastSec:30,futureSec:45,targetLife:30,hitPct:0.035,maxT:8,microMs:50,headRatio:0.4,fetchMs:3000,rangePadPct:0.35,pwrSpawnInterval:20000,pwrLife:12000};
 const S={score:0,hits:0,misses:0,streak:0,bet:25,targets:[],ph:[],cp:null,pMin:0,pMax:0,t0:null,running:false,lastMicro:0,lastFetch:0,dpr:1,w:0,h:0,cw:0,ch:0,anims:[],realPrice:null,velocity:0,fetchOk:false,wsConnected:false,statusText:'Connecting...',
-  // Smooth interpolation state
   displayPrice:null,targetPrice:null,priceVel:0,
-  // Range smoothing
   targetPMin:0,targetPMax:0,
+  // New state
+  particles:[],
+  powerups:[],        // on-chart collectible powerups
+  activePowers:{},    // {type: {until:timestamp}} for timed effects, or {shield:true} for one-shot
+  shake:{x:0,y:0,intensity:0},
+  screenFlash:null,
+  lastPwrSpawn:0,
+  rank:0,
+  lastRank:0,
 };
 
 // ══════════════════════════════════════
-// REAL-TIME BTC PRICE — 3 strategies:
-// 1. Binance WebSocket (real-time, free, no key)
-// 2. HTTP polling (CoinDesk/CoinGecko/Binance REST)
-// 3. Realistic simulation fallback
+// 1. SOUND EFFECTS (Web Audio API)
+// ══════════════════════════════════════
+const SFX={
+  ctx:null,
+  init(){
+    if(this.ctx)return;
+    try{this.ctx=new(window.AudioContext||window.webkitAudioContext)();}catch{}
+  },
+  _osc(freq,type,dur,vol){
+    if(!this.ctx)return;
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol||0.12,this.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+dur);
+    o.connect(g);g.connect(this.ctx.destination);
+    o.start();o.stop(this.ctx.currentTime+dur);
+  },
+  click(){this._osc(800,'sine',0.06,0.1);},
+  chime(streak){
+    const base=520+Math.min(streak,15)*30;
+    this._osc(base,'sine',0.15,0.13);
+    setTimeout(()=>this._osc(base*1.25,'sine',0.12,0.1),60);
+  },
+  buzz(){
+    this._osc(150,'sawtooth',0.2,0.08);
+    this._osc(180,'square',0.15,0.05);
+  },
+  arpeggio(){
+    const notes=[523,659,784,1047];
+    notes.forEach((f,i)=>setTimeout(()=>this._osc(f,'sine',0.15,0.1),i*70));
+  },
+  swoosh(){
+    if(!this.ctx)return;
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(300,this.ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1200,this.ctx.currentTime+0.15);
+    g.gain.setValueAtTime(0.08,this.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+0.2);
+    o.connect(g);g.connect(this.ctx.destination);
+    o.start();o.stop(this.ctx.currentTime+0.2);
+  },
+  levelUp(){
+    const notes=[523,659,784,1047,1318];
+    notes.forEach((f,i)=>setTimeout(()=>this._osc(f,'sine',0.2,0.12),i*90));
+  }
+};
+
+// ══════════════════════════════════════
+// 2. SCREEN SHAKE
+// ══════════════════════════════════════
+function triggerShake(intensity){
+  S.shake.intensity=Math.max(S.shake.intensity,intensity);
+}
+function updateShake(){
+  if(S.shake.intensity>0.1){
+    S.shake.x=(Math.random()-0.5)*S.shake.intensity*2;
+    S.shake.y=(Math.random()-0.5)*S.shake.intensity*2;
+    S.shake.intensity*=0.85; // rapid decay
+  }else{
+    S.shake.x=0;S.shake.y=0;S.shake.intensity=0;
+  }
+}
+
+// ══════════════════════════════════════
+// 3. PARTICLE SYSTEM
+// ══════════════════════════════════════
+function spawnParticles(x,y,type){
+  const count=type==='hit'?18:type==='miss'?10:type==='levelup'?30:type==='milestone'?20:2;
+  for(let i=0;i<count;i++){
+    if(S.particles.length>=200)break;
+    const angle=Math.random()*Math.PI*2;
+    const speed=type==='trail'?0.3+Math.random()*0.8:1.5+Math.random()*3;
+    let color;
+    if(type==='hit')color=Math.random()>0.4?'rgba(52,211,153,':'rgba(255,255,255,';
+    else if(type==='miss')color='rgba(251,113,133,';
+    else if(type==='trail')color=Math.random()>0.5?'rgba(255,255,245,':'rgba(194,76,219,';
+    else if(type==='levelup')color=Math.random()>0.5?'rgba(255,215,0,':'rgba(194,76,219,';
+    else if(type==='milestone')color=Math.random()>0.3?'rgba(255,180,0,':'rgba(255,255,255,';
+    else color='rgba(255,255,255,';
+    S.particles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      life:1,
+      decay:0.015+Math.random()*0.025,
+      size:type==='trail'?1+Math.random():1.5+Math.random()*2.5,
+      color
+    });
+  }
+}
+function updateParticles(){
+  for(let i=S.particles.length-1;i>=0;i--){
+    const p=S.particles[i];
+    p.x+=p.vx;p.y+=p.vy;
+    p.vy+=0.04; // gravity
+    p.vx*=0.98;
+    p.life-=p.decay;
+    if(p.life<=0)S.particles.splice(i,1);
+  }
+}
+function drawParticles(){
+  for(const p of S.particles){
+    X.fillStyle=p.color+p.life.toFixed(2)+')';
+    X.beginPath();X.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);X.fill();
+  }
+}
+
+// ══════════════════════════════════════
+// 4. COMBO/STREAK
+// ══════════════════════════════════════
+function streakMultiplier(){return 1+Math.min(S.streak,20)*0.1;}
+function updateStreakUI(){
+  const el=document.getElementById('vS');
+  el.textContent=S.streak;
+  const sm=streakMultiplier();
+  if(sm>1)el.textContent+=(' x'+sm.toFixed(1));
+  // CSS glow classes
+  el.classList.remove('streak-fire','streak-blaze','streak-inferno');
+  if(S.streak>=15)el.classList.add('streak-inferno');
+  else if(S.streak>=8)el.classList.add('streak-blaze');
+  else if(S.streak>=3)el.classList.add('streak-fire');
+}
+function checkStreakMilestone(){
+  if(S.streak>0&&S.streak%5===0){
+    SFX.arpeggio();
+    triggerShake(10);
+    screenFlash('rgba(255,180,0,0.15)',400);
+    // Bonus particles at center of screen
+    spawnParticles(S.cw/2,S.ch/2,'milestone');
+    showN('STREAK x'+S.streak+'!',false);
+  }
+}
+
+// ══════════════════════════════════════
+// 5. HIGH SCORE (localStorage)
+// ══════════════════════════════════════
+const HS={
+  bestScore:0,bestStreak:0,totalHits:0,
+  load(){
+    try{
+      const d=JSON.parse(localStorage.getItem('snakeTrade_hs'));
+      if(d){this.bestScore=d.bestScore||0;this.bestStreak=d.bestStreak||0;this.totalHits=d.totalHits||0;}
+    }catch{}
+  },
+  save(){
+    try{localStorage.setItem('snakeTrade_hs',JSON.stringify({bestScore:this.bestScore,bestStreak:this.bestStreak,totalHits:this.totalHits}));}catch{}
+  },
+  check(score,streak,hits){
+    let isNew=false;
+    if(score>this.bestScore){this.bestScore=score;isNew=true;}
+    if(streak>this.bestStreak){this.bestStreak=streak;}
+    this.totalHits+=hits?1:0;
+    if(isNew&&score>0)this.showCelebration();
+    this.save();
+    return isNew;
+  },
+  showCelebration(){
+    const el=document.getElementById('hsNotif');
+    el.classList.add('show');
+    SFX.arpeggio();
+    triggerShake(8);
+    screenFlash('rgba(255,215,0,0.12)',500);
+    spawnParticles(S.cw/2,S.ch/3,'levelup');
+    setTimeout(()=>el.classList.remove('show'),2500);
+  },
+  renderSplash(){
+    const el=document.getElementById('hsSplash');
+    if(this.bestScore<=0){el.innerHTML='';return;}
+    el.innerHTML='<div class="hs-splash">Best Score: <span class="hs-val">'+this.bestScore+' pts</span> &nbsp; Best Streak: <span class="hs-val">'+this.bestStreak+'</span> &nbsp; Total Hits: <span class="hs-val">'+this.totalHits+'</span></div>';
+  }
+};
+
+// ══════════════════════════════════════
+// 6. SCREEN FLASH
+// ══════════════════════════════════════
+function screenFlash(color,duration){
+  S.screenFlash={color,time:Date.now(),duration:duration||300};
+}
+function drawScreenFlash(){
+  if(!S.screenFlash)return;
+  const elapsed=Date.now()-S.screenFlash.time;
+  if(elapsed>S.screenFlash.duration){S.screenFlash=null;return;}
+  const alpha=1-elapsed/S.screenFlash.duration;
+  X.save();
+  X.globalAlpha=alpha;
+  X.fillStyle=S.screenFlash.color;
+  X.fillRect(0,0,S.w,S.h);
+  X.restore();
+}
+
+// ══════════════════════════════════════
+// 8. POWER-UPS
+// ══════════════════════════════════════
+const PWR_TYPES=[
+  {type:'2x',label:'2X',color:'#ffd700',bg:'rgba(255,215,0,0.2)',desc:'Double Points',dur:15000},
+  {type:'shield',label:'SH',color:'#38bdf8',bg:'rgba(56,189,248,0.2)',desc:'Shield',dur:0},
+  {type:'freeze',label:'FR',color:'#22d3ee',bg:'rgba(34,211,238,0.2)',desc:'Freeze Timer',dur:10000},
+  {type:'magnet',label:'MG',color:'#a855f7',bg:'rgba(168,85,247,0.2)',desc:'Magnet (2x Zone)',dur:15000},
+];
+function spawnPowerup(){
+  if(S.powerups.length>=2)return;
+  if(!S.cp||S.ph.length<5)return;
+  const now=Date.now();
+  const def=PWR_TYPES[Math.floor(Math.random()*PWR_TYPES.length)];
+  const range=S.pMax-S.pMin;
+  const price=S.pMin+range*0.15+Math.random()*range*0.7;
+  const time=now+5000+Math.random()*20000; // 5-25s in the future
+  S.powerups.push({
+    id:now+Math.random(),
+    ...def,
+    p:price,t:time,
+    spawnAt:now,
+    life:CFG.pwrLife,
+    collected:false
+  });
+}
+function drawPowerups(){
+  const now=Date.now();
+  for(let i=S.powerups.length-1;i>=0;i--){
+    const pw=S.powerups[i];
+    if(pw.collected){S.powerups.splice(i,1);continue;}
+    const age=now-pw.spawnAt;
+    if(age>pw.life){S.powerups.splice(i,1);continue;}
+    const x=t2x(pw.t),y=p2y(pw.p);
+    if(x<-50||x>S.cw+50||y<-50||y>S.ch+50)continue;
+    const lifeRatio=1-age/pw.life;
+    // Glow
+    X.save();
+    X.shadowColor=pw.color;X.shadowBlur=12+Math.sin(now/200)*4;
+    X.fillStyle=pw.bg;
+    X.beginPath();X.arc(x,y,18,0,Math.PI*2);X.fill();
+    X.restore();
+    // Countdown ring
+    X.strokeStyle=pw.color;X.lineWidth=2;
+    X.beginPath();X.arc(x,y,20,-Math.PI/2,-Math.PI/2+Math.PI*2*lifeRatio);X.stroke();
+    // Label
+    X.fillStyle=pw.color;X.font='bold 11px "JetBrains Mono"';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText(pw.label,x,y);
+  }
+}
+function tryCollectPowerup(cx,cy){
+  const rect=GW.getBoundingClientRect();
+  const lx=cx-rect.left,ly=cy-rect.top;
+  for(const pw of S.powerups){
+    if(pw.collected)continue;
+    const x=t2x(pw.t),y=p2y(pw.p);
+    const dx=lx-x,dy=ly-y;
+    if(dx*dx+dy*dy<900){ // 30px radius
+      pw.collected=true;
+      activatePowerup(pw);
+      SFX.swoosh();
+      triggerShake(3);
+      spawnParticles(x,y,'hit');
+      return true;
+    }
+  }
+  return false;
+}
+function activatePowerup(pw){
+  const now=Date.now();
+  if(pw.type==='shield'){
+    S.activePowers.shield={active:true,oneShot:true};
+  }else{
+    S.activePowers[pw.type]={until:now+pw.dur};
+  }
+  showN(pw.desc+' activated!',false);
+  screenFlash(pw.bg,250);
+  updatePwrHud();
+}
+function isPowerActive(type){
+  const p=S.activePowers[type];
+  if(!p)return false;
+  if(p.oneShot)return p.active;
+  return Date.now()<p.until;
+}
+function consumeShield(){
+  if(S.activePowers.shield&&S.activePowers.shield.active){
+    S.activePowers.shield.active=false;
+    updatePwrHud();
+    showN('Shield absorbed the hit!',false);
+    screenFlash('rgba(56,189,248,0.15)',300);
+    return true;
+  }
+  return false;
+}
+function updatePwrHud(){
+  const hud=document.getElementById('pwrHud');
+  const now=Date.now();
+  let html='';
+  for(const [type,data] of Object.entries(S.activePowers)){
+    if(data.oneShot&&!data.active)continue;
+    if(!data.oneShot&&now>=data.until)continue;
+    const def=PWR_TYPES.find(p=>p.type===type);
+    if(!def)continue;
+    let timeLeft='';
+    if(!data.oneShot){
+      const sec=Math.ceil((data.until-now)/1000);
+      timeLeft=' '+sec+'s';
+    }else{
+      timeLeft=' Ready';
+    }
+    html+='<div class="pwr-item pwr-'+type+'">'+def.desc+timeLeft+'</div>';
+  }
+  hud.innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// 9. LEVEL / RANK PROGRESSION
+// ══════════════════════════════════════
+const RANKS=[
+  {name:'Newbie',emoji:'🌱',min:0},
+  {name:'Trader',emoji:'📊',min:100},
+  {name:'Analyst',emoji:'🔍',min:300},
+  {name:'Shark',emoji:'🦈',min:600},
+  {name:'Whale',emoji:'🐋',min:1000},
+  {name:'Legend',emoji:'👑',min:2000},
+  {name:'Oracle',emoji:'🔮',min:5000},
+  {name:'Satoshi',emoji:'₿',min:10000},
+];
+function getRank(score){
+  let r=0;
+  for(let i=RANKS.length-1;i>=0;i--){
+    if(score>=RANKS[i].min){r=i;break;}
+  }
+  return r;
+}
+function updateRankUI(){
+  const r=getRank(S.score);
+  const rank=RANKS[r];
+  document.getElementById('rankBadge').textContent=rank.emoji+' '+rank.name;
+  // Progress bar toward next rank
+  const next=r<RANKS.length-1?RANKS[r+1]:null;
+  if(next){
+    const progress=(S.score-rank.min)/(next.min-rank.min)*100;
+    document.getElementById('rankFill').style.width=Math.min(100,Math.max(0,progress))+'%';
+  }else{
+    document.getElementById('rankFill').style.width='100%';
+  }
+  // Check for level-up
+  if(r>S.lastRank&&S.lastRank>=0){
+    SFX.levelUp();
+    triggerShake(8);
+    screenFlash('rgba(194,76,219,0.2)',500);
+    spawnParticles(S.cw/2,S.ch/2,'levelup');
+    showN('Rank Up: '+rank.emoji+' '+rank.name+'!',false);
+  }
+  S.lastRank=r;
+}
+
+// ══════════════════════════════════════
+// REAL-TIME BTC PRICE — 3 strategies
 // ══════════════════════════════════════
 
-let ws=null;
+let ws=null,wsRetries=0;
 function connectWS(){
   try{
     ws=new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-    ws.onopen=()=>{S.wsConnected=true;S.fetchOk=true;S.statusText='LIVE';};
+    ws.onopen=()=>{S.wsConnected=true;S.fetchOk=true;S.statusText='LIVE';wsRetries=0;};
     ws.onmessage=(e)=>{
       try{
         const d=JSON.parse(e.data);
@@ -115,21 +522,19 @@ function connectWS(){
     };
     ws.onerror=()=>{S.wsConnected=false;ws=null;};
     ws.onclose=()=>{S.wsConnected=false;ws=null;
-      // Retry in 5s
-      setTimeout(connectWS,5000);
+      const delay=Math.min(2000*Math.pow(2,wsRetries),30000);
+      wsRetries++;
+      setTimeout(connectWS,delay);
     };
   }catch{S.wsConnected=false;}
 }
 
 function onRealPrice(p){
   const now=Date.now();
-
-  // First real price arrival: wipe all sim history completely
   if(!S.fetchOk){
     S.ph=[];
     S.pMin=0;S.pMax=0;
   }
-
   if(S.realPrice&&S.realPrice>0){
     const raw=p-S.realPrice;
     S.velocity=S.velocity*0.7+raw*0.3;
@@ -143,13 +548,12 @@ function onRealPrice(p){
   addP(now,p);
 }
 
-// HTTP fallback polling
 async function httpFetch(){
   const urls=[
-    {url:'https://api.coindesk.com/v1/bpi/currentprice/USD.json',parse:d=>d.bpi.USD.rate_float},
-    {url:'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',parse:d=>d.bitcoin.usd},
     {url:'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',parse:d=>parseFloat(d.price)},
+    {url:'https://api.coinbase.com/v2/prices/BTC-USD/spot',parse:d=>parseFloat(d.data.amount)},
     {url:'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD',parse:d=>d.USD},
+    {url:'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',parse:d=>{const k=Object.keys(d.result)[0];return parseFloat(d.result[k].c[0]);}},
   ];
   for(const {url,parse} of urls){
     try{
@@ -162,23 +566,31 @@ async function httpFetch(){
   return null;
 }
 
+async function fetchRealHistory(){
+  try{
+    const r=await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1s&limit='+CFG.pastSec,{signal:AbortSignal.timeout(5000)});
+    const data=await r.json();
+    if(!Array.isArray(data)||data.length<5)return null;
+    return data.map(k=>({t:k[0],p:parseFloat(k[4])}));
+  }catch{return null;}
+}
+
 async function doFetch(){
-  if(S.wsConnected)return; // WS is handling it
+  if(S.wsConnected)return;
   const now=Date.now();
   if(now-S.lastFetch<CFG.fetchMs)return;
   S.lastFetch=now;
   const p=await httpFetch();
   if(p&&p>0){
     onRealPrice(p);
-    S.statusText='LIVE (poll)';
+    S.statusText='POLL';
   }else if(!S.fetchOk){
-    S.statusText='SIMULATED';
+    S.statusText='SIM';
   }
 }
 
-// ── Realistic Simulation (fallback when APIs blocked) ──
-// Models real BTC: ~$5-15 moves per second, occasional $20-30 jumps
-let simPrice=0,simVel=0,simTrend=0,simTrendTimer=0,simVolRegime=1,simBase=97500;
+// ── Realistic Simulation (fallback) ──
+let simPrice=0,simVel=0,simTrend=0,simTrendTimer=0,simVolRegime=1,simBase=85000;
 
 function initSim(base){
   simPrice=base;simBase=base;simVel=0;
@@ -190,50 +602,32 @@ function initSim(base){
 function simTick(dtSec){
   const now=Date.now();
   dtSec=Math.min(dtSec,0.15);
-
   if(now>simTrendTimer){
     simTrend=(Math.random()-0.5)*0.2;
     simTrendTimer=now+8000+Math.random()*25000;
     simVolRegime=0.7+Math.random()*0.5;
   }
-
-  // Gaussian noise
   const u1=Math.random(),u2=Math.random();
   const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
-
-  // ~$3-8 per tick at 50ms (scaled by dt)
   const tickNoise=g*4*Math.sqrt(dtSec/0.05)*simVolRegime;
-
-  // Mean reversion to base
   const reversion=(simBase-simPrice)*0.003*dtSec;
-
-  // Trend drift
   const drift=simTrend*dtSec*10;
-
   simVel=simVel*0.7+tickNoise+drift+reversion;
-
-  // Clamp velocity to ~$15 max per tick
   simVel=Math.max(-15,Math.min(15,simVel));
-
-  // Occasional jumps ($10-25)
   if(Math.random()<0.005){
     simVel+=(Math.random()-0.5)*20;
   }
-
   simPrice+=simVel;
-
-  // Stay within ±0.3% of base (~$300 range for ~$97k BTC)
   const maxDrift=simBase*0.003;
   simPrice=Math.max(simBase-maxDrift,Math.min(simBase+maxDrift,simPrice));
-
   return simPrice;
 }
 
-// ── Micro Updates — runs every ~50ms for smooth line ──
+// ── Micro Updates ──
 function microUpdate(){
   const now=Date.now();
   if(now-S.lastMicro<CFG.microMs)return;
-  const dt=Math.min((now-S.lastMicro)/1000,0.2); // clamp dt
+  const dt=Math.min((now-S.lastMicro)/1000,0.2);
   S.lastMicro=now;
   if(!S.cp||S.ph.length<2)return;
 
@@ -254,7 +648,6 @@ function microUpdate(){
     newP=simTick(dt);
   }
 
-  // Sanity check — never let price go negative or insane
   if(!isFinite(newP)||newP<=0)newP=last.p;
 
   S.ph.push({t:now,p:newP});
@@ -262,7 +655,6 @@ function microUpdate(){
   S.displayPrice=newP;
   if(S.ph.length>2000)S.ph.shift();
 
-  // Auto-zoom: use only recent 10s for Y-range — ultra tight
   const rangeWindow=10000;
   const cutT=now-rangeWindow;
   let rMn=newP,rMx=newP;
@@ -272,8 +664,6 @@ function microUpdate(){
     if(S.ph[i].p>rMx)rMx=S.ph[i].p;
   }
   const rng=rMx-rMn;
-  // $1 move should span ~4 rows out of ~10 visible = $2.5 total range
-  // minRange=$3 means the chart shows $3 minimum, so $1 = 3-4 blocks
   const minRange=3;
   const visRange=Math.max(rng,minRange);
   const pad=visRange*0.25;
@@ -284,6 +674,13 @@ function microUpdate(){
   S.pMax+=(S.targetPMax-S.pMax)*0.1;
 
   document.getElementById('hP').textContent='$'+newP.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Trail particles at price head
+  if(S.running&&Math.random()<0.4){
+    const hx=S.cw*CFG.headRatio;
+    const hy=p2y(newP);
+    spawnParticles(hx,hy,'trail');
+  }
 }
 
 function addP(t,p){
@@ -317,7 +714,6 @@ function updateRange(){
 function p2y(p){return S.pMax<=S.pMin?S.ch/2:S.ch*(1-(p-S.pMin)/(S.pMax-S.pMin))}
 function y2p(y){return S.pMin+(1-y/S.ch)*(S.pMax-S.pMin)}
 
-// Frame-stable timestamp: set once per frame to prevent jitter
 let frameNow=Date.now();
 
 function t2x(t){
@@ -398,7 +794,6 @@ function drawHeat(){
   for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){
     const cx=c*cw+cw/2,cy=r*ch+ch/2,cellP=y2p(cy);
     const pDiff=Math.abs(cellP-S.cp),dr=pDiff/range;
-    // Time factor: cells ahead of the head get a boost
     const timeFactor=cx>headX?1+((cx-headX)/(S.cw-headX))*0.3:1;
     const mult=(1+dr*12*timeFactor).toFixed(1);
     const alpha=0.08+Math.min(dr*2,1)*0.3;
@@ -409,25 +804,20 @@ function drawHeat(){
 function drawLine(){
   const pts=S.ph;if(pts.length<3)return;
 
-  // Downsample: with 50ms updates we get ~20pts/sec, 80sec past = ~1600pts
-  // Draw every Nth point, but keep recent ones dense
   const now=Date.now();
   const visible=[];
   for(let i=0;i<pts.length;i++){
     const x=t2x(pts[i].t);
     if(x<-50)continue;if(x>S.cw+50)break;
     const age=now-pts[i].t;
-    // Recent 5s: every point. 5-20s: every 2nd. 20s+: every 4th
     if(age<5000||i%2===0&&age<20000||i%4===0){
       visible.push(pts[i]);
     }
   }
   if(visible.length<3)return;
 
-  // Convert to screen coords
   const sc=visible.map(p=>({x:t2x(p.t),y:p2y(p.p)}));
 
-  // Area fill under curve — very subtle
   X.beginPath();
   drawCatmullRomPath(sc);
   X.lineTo(sc[sc.length-1].x,S.ch);
@@ -437,7 +827,6 @@ function drawLine(){
   ag.addColorStop(0,'rgba(194,76,219,0.03)');ag.addColorStop(1,'rgba(194,76,219,0)');
   X.fillStyle=ag;X.fill();
 
-  // Main line — old portion (dimmer)
   const splitIdx=Math.max(0,sc.length-40);
   if(splitIdx>2){
     X.beginPath();
@@ -447,7 +836,6 @@ function drawLine(){
     X.stroke();X.restore();
   }
 
-  // Bright tip — recent portion
   const tipPts=sc.slice(Math.max(0,splitIdx-1));
   if(tipPts.length>=2){
     X.beginPath();
@@ -457,7 +845,6 @@ function drawLine(){
     X.stroke();X.restore();
   }
 
-  // Head
   const last=sc[sc.length-1];
   const hx=last.x,hy=last.y;
   const hg=X.createRadialGradient(hx,hy,0,hx,hy,14);
@@ -465,33 +852,27 @@ function drawLine(){
   X.fillStyle=hg;X.beginPath();X.arc(hx,hy,14,0,Math.PI*2);X.fill();
   X.fillStyle='#fff';X.beginPath();X.arc(hx,hy,3.5,0,Math.PI*2);X.fill();
 
-  // 'Now' vertical guide
   X.strokeStyle='rgba(232,56,158,0.1)';X.lineWidth=0.6;
   X.beginPath();X.moveTo(hx,0);X.lineTo(hx,S.ch);X.stroke();
 
-  // Dashed line from head to right edge
   X.setLineDash([4,4]);X.strokeStyle='rgba(232,56,158,0.28)';X.lineWidth=0.6;
   X.beginPath();X.moveTo(hx,hy);X.lineTo(S.cw,hy);X.stroke();X.setLineDash([]);
 }
 
-// Catmull-Rom spline through points — much smoother than lineTo
 function drawCatmullRomPath(pts,tension){
   tension=tension||0.35;
   if(pts.length<2)return;
   X.moveTo(pts[0].x,pts[0].y);
   if(pts.length===2){X.lineTo(pts[1].x,pts[1].y);return;}
-
   for(let i=0;i<pts.length-1;i++){
     const p0=pts[Math.max(0,i-1)];
     const p1=pts[i];
     const p2=pts[Math.min(pts.length-1,i+1)];
     const p3=pts[Math.min(pts.length-1,i+2)];
-
     const cp1x=p1.x+(p2.x-p0.x)*tension;
     const cp1y=p1.y+(p2.y-p0.y)*tension;
     const cp2x=p2.x-(p3.x-p1.x)*tension;
     const cp2y=p2.y-(p3.y-p1.y)*tension;
-
     X.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,p2.x,p2.y);
   }
 }
@@ -508,7 +889,19 @@ function drawTargets(){
     if(tgt.done)return;
     const x=t2x(tgt.t),y=p2y(tgt.p);
     if(x<-60||x>S.cw+60||y<-60||y>S.ch+60)return;
-    const el=now-tgt.at,life=Math.max(0,1-el/(CFG.targetLife*1000));
+    // Freeze power-up pauses expiry
+    let el=now-tgt.at;
+    if(isPowerActive('freeze')&&!tgt._frozenAccum){tgt._frozenAccum=0;}
+    if(isPowerActive('freeze')){
+      // Don't advance the age while frozen
+      if(!tgt._lastFreezeCheck)tgt._lastFreezeCheck=now;
+      tgt._frozenAccum+=(now-tgt._lastFreezeCheck);
+      tgt._lastFreezeCheck=now;
+      el=now-tgt.at-tgt._frozenAccum;
+    }else{
+      if(tgt._lastFreezeCheck)tgt._lastFreezeCheck=null;
+    }
+    const life=Math.max(0,1-el/(CFG.targetLife*1000));
     if(life<=0){resolveT(tgt,false);return}
     const bw=44,bh=36,bx=x-bw/2,by=y-bh/2;
 
@@ -548,17 +941,30 @@ function drawAnims(){
 }
 
 function draw(){
-  frameNow=Date.now(); // snapshot time for this frame — prevents jitter
+  frameNow=Date.now();
+  updateShake();
+  updateParticles();
   X.clearRect(0,0,S.w,S.h);
   const bg=X.createLinearGradient(0,0,0,S.h);
   bg.addColorStop(0,'#0f091f');bg.addColorStop(1,'#0a0614');
   X.fillStyle=bg;X.fillRect(0,0,S.w,S.h);
+
+  // Apply screen shake
+  X.save();
+  X.translate(S.shake.x,S.shake.y);
+
   X.save();X.beginPath();X.rect(0,0,S.cw,S.ch);X.clip();
-  drawGrid();drawHeat();drawTargets();drawAnims();drawLine();
+  drawGrid();drawHeat();drawPowerups();drawTargets();drawAnims();drawParticles();drawLine();
   X.restore();
+
+  X.restore(); // end shake translate
+
   X.strokeStyle='rgba(180,80,200,0.16)';X.lineWidth=0.7;
   X.beginPath();X.moveTo(S.cw,0);X.lineTo(S.cw,S.ch);X.stroke();
   X.beginPath();X.moveTo(0,S.ch);X.lineTo(S.w,S.ch);X.stroke();
+
+  // Screen flash overlay
+  drawScreenFlash();
 
   if(S.cp){
     const py=p2y(S.cp),tag=document.getElementById('pt'),wh=GW.getBoundingClientRect().height;
@@ -567,7 +973,7 @@ function draw(){
   }
 }
 
-// ── Price + Target Logic ── (addP, microUpdate, updateRange defined above)
+// ── Price + Target Logic ──
 
 function placeT(cx,cy){
   const ac=S.targets.filter(t=>!t.done).length;
@@ -575,12 +981,13 @@ function placeT(cx,cy){
   if(S.ph.length<5){showN('Waiting for data...',true);return}
   const rect=GW.getBoundingClientRect(),lx=cx-rect.left,ly=cy-rect.top;
   if(lx>S.cw||ly>S.ch||lx<0||ly<0)return;
-  frameNow=Date.now(); // update for accurate x2t
+  frameNow=Date.now();
   const price=y2p(ly),time=x2t(lx),now=frameNow;
   if(time<now-5000){showN('Tap to the right of the line!',true);return}
   const range=S.pMax-S.pMin,diff=Math.abs(price-S.cp),dr=diff/range;
   const mult=Math.max(1.05,1+dr*13);
   S.targets.push({id:now+Math.random(),p:price,t:Math.max(time,now),pts:S.bet,mult:Math.round(mult*100)/100,at:now,done:false});
+  SFX.click();
   if(navigator.vibrate)navigator.vibrate(20);
 }
 
@@ -588,13 +995,16 @@ function checkT(){
   const now=Date.now();if(!S.cp)return;
   const range=S.pMax-S.pMin;
   if(range<=0)return;
-  const thresh=range*CFG.hitPct;
+  let thresh=range*CFG.hitPct;
+  // Magnet power-up doubles hit zone
+  if(isPowerActive('magnet'))thresh*=2;
 
   S.targets.forEach(tgt=>{
     if(tgt.done)return;
-    // Expired?
-    if(now-tgt.at>CFG.targetLife*1000){resolveT(tgt,false);return}
-    // Hit = price is within threshold of target price. That's it.
+    // Freeze: use adjusted age
+    let el=now-tgt.at;
+    if(tgt._frozenAccum)el-=tgt._frozenAccum;
+    if(el>CFG.targetLife*1000){resolveT(tgt,false);return}
     if(Math.abs(S.cp-tgt.p)<=thresh){
       resolveT(tgt,true);
     }
@@ -603,19 +1013,43 @@ function checkT(){
 
 function resolveT(tgt,hit){
   tgt.done=true;S.anims.push({t:tgt.t,p:tgt.p,hit,st:Date.now()});
+  const tx=t2x(tgt.t),ty=p2y(tgt.p);
   if(hit){
-    const earned=Math.round(tgt.pts*tgt.mult);
+    let earned=Math.round(tgt.pts*tgt.mult);
+    // Streak multiplier
+    const sm=streakMultiplier();
+    earned=Math.round(earned*sm);
+    // 2X power-up
+    if(isPowerActive('2x'))earned*=2;
     S.score+=earned;S.hits++;S.streak++;
-    showN('🎉 You won '+earned+'pts!',false);
+    showN('+'+earned+'pts! (x'+sm.toFixed(1)+')',false);
     showFloat(tgt,'+'+earned,true);
+    SFX.chime(S.streak);
+    triggerShake(3);
+    spawnParticles(tx,ty,'hit');
+    checkStreakMilestone();
+    HS.check(S.score,S.streak,true);
     if(navigator.vibrate)navigator.vibrate([15,30,15]);
   }else{
+    // Shield absorbs the miss
+    if(consumeShield()){
+      tgt.done=true;
+      S.streak=0; // still breaks streak
+      updS();
+      setTimeout(()=>{S.targets=S.targets.filter(x=>x.id!==tgt.id)},800);
+      return;
+    }
     S.score-=tgt.pts;S.misses++;S.streak=0;
-    showN('❌ Lost '+tgt.pts+'pts',true);
+    showN('-'+tgt.pts+'pts',true);
     showFloat(tgt,'-'+tgt.pts,false);
+    SFX.buzz();
+    triggerShake(6);
+    spawnParticles(tx,ty,'miss');
     if(navigator.vibrate)navigator.vibrate(70);
   }
   updS();
+  updateStreakUI();
+  updateRankUI();
   setTimeout(()=>{S.targets=S.targets.filter(x=>x.id!==tgt.id)},800);
 }
 
@@ -623,7 +1057,7 @@ function updS(){
   document.getElementById('sD').textContent=S.score+' pts';
   document.getElementById('vH').textContent=S.hits;
   document.getElementById('vM').textContent=S.misses;
-  document.getElementById('vS').textContent=S.streak+'🔥';
+  updateStreakUI();
 }
 
 function updTm(){
@@ -648,32 +1082,76 @@ function showFloat(tgt,txt,win){
   document.body.appendChild(el);setTimeout(()=>el.remove(),900);
 }
 
+// ══════════════════════════════════════
+// 7. QUICK PREDICT BUTTONS
+// ══════════════════════════════════════
+function quickPredict(direction){
+  if(!S.running||!S.cp)return;
+  const range=S.pMax-S.pMin;
+  const offset=range*0.15;
+  const price=direction==='up'?S.cp+offset:S.cp-offset;
+  const futureTime=Date.now()+8000;
+  const diff=Math.abs(price-S.cp),dr=diff/range;
+  const mult=Math.max(1.05,1+dr*13);
+  const ac=S.targets.filter(t=>!t.done).length;
+  if(ac>=CFG.maxT){showN('Max '+CFG.maxT+' targets!',true);return}
+  S.targets.push({id:Date.now()+Math.random(),p:price,t:futureTime,pts:S.bet,mult:Math.round(mult*100)/100,at:Date.now(),done:false});
+  SFX.click();
+  if(navigator.vibrate)navigator.vibrate(20);
+}
+
 // ── Events ──
-GW.addEventListener('click',e=>{if(!S.running)return;placeT(e.clientX,e.clientY)});
-GW.addEventListener('touchstart',e=>{if(!S.running)return;e.preventDefault();placeT(e.touches[0].clientX,e.touches[0].clientY)},{passive:false});
+GW.addEventListener('click',e=>{
+  if(!S.running)return;
+  // Check power-up collection first
+  if(tryCollectPowerup(e.clientX,e.clientY))return;
+  placeT(e.clientX,e.clientY);
+});
+GW.addEventListener('touchstart',e=>{
+  if(!S.running)return;e.preventDefault();
+  const cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+  if(tryCollectPowerup(cx,cy))return;
+  placeT(cx,cy);
+},{passive:false});
 document.querySelectorAll('.bo').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.bo').forEach(x=>x.classList.remove('a'));b.classList.add('a');S.bet=parseInt(b.dataset.p)})});
-document.getElementById('go').addEventListener('click',()=>{document.getElementById('ov').classList.add('hd');S.t0=Date.now();S.running=true});
+document.getElementById('go').addEventListener('click',()=>{
+  SFX.init();
+  document.getElementById('ov').classList.add('hd');
+  S.t0=Date.now();S.running=true;S.lastPwrSpawn=Date.now();
+});
+document.getElementById('qpUp').addEventListener('click',()=>quickPredict('up'));
+document.getElementById('qpDown').addEventListener('click',()=>quickPredict('down'));
 window.addEventListener('resize',resize);
 
 // ── Loop ──
-let _statusTimer=0;
+let _statusTimer=0,_pwrHudTimer=0;
 function loop(){
   if(S.running){
     doFetch();microUpdate();updTm();checkT();
     const now=Date.now();
     if(now-_statusTimer>3000){_statusTimer=now;updateStatusUI();}
+    // Power-up spawn check
+    if(now-S.lastPwrSpawn>CFG.pwrSpawnInterval){
+      S.lastPwrSpawn=now;
+      spawnPowerup();
+    }
+    // Update power-up HUD every 500ms
+    if(now-_pwrHudTimer>500){_pwrHudTimer=now;updatePwrHud();}
   }
   draw();requestAnimationFrame(loop);
 }
 
 // ── Init ──
 resize();
+HS.load();
+HS.renderSplash();
 
 async function init(){
   let basePrice=null;
+  let realHistory=null;
 
-  // 1. Try HTTP fetch first to get a starting price
-  const httpP=await httpFetch();
+  const [httpP,histData]=await Promise.all([httpFetch(),fetchRealHistory()]);
+
   if(httpP&&httpP>0){
     basePrice=httpP;
     S.realPrice=httpP;
@@ -681,44 +1159,69 @@ async function init(){
     S.statusText='LIVE';
   }
 
-  // 2. Try WebSocket for real-time stream
+  if(histData&&histData.length>0){
+    realHistory=histData;
+    if(!basePrice){
+      basePrice=histData[histData.length-1].p;
+      S.realPrice=basePrice;
+      S.fetchOk=true;
+      S.statusText='LIVE';
+    }
+  }
+
   connectWS();
 
-  // 3. Fallback to simulation if no API works
   if(!basePrice){
-    // Use a recent realistic BTC price as base
-    basePrice=97500+Math.random()*200;
+    basePrice=85000+Math.random()*200;
     S.statusText='SIMULATED';
   }
 
   initSim(basePrice);
 
-  // Seed history — dense points, realistic $5-15 moves
   const n=Date.now();
-  let p=basePrice;
-  let v=0;
-  const seedCount=CFG.pastSec*20;
-  const seedInterval=CFG.pastSec*1000/seedCount;
-  const maxSeedDrift=basePrice*0.003; // ±0.3%
+  if(realHistory&&realHistory.length>0){
+    for(let i=0;i<realHistory.length;i++){
+      const kl=realHistory[i];
+      S.ph.push({t:kl.t,p:kl.p});
+      if(i<realHistory.length-1){
+        const next=realHistory[i+1];
+        const steps=4;
+        for(let s=1;s<steps;s++){
+          const frac=s/steps;
+          const u1=Math.random(),u2=Math.random();
+          const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
+          const interP=kl.p+(next.p-kl.p)*frac+g*0.5;
+          S.ph.push({t:kl.t+(next.t-kl.t)*frac,p:interP});
+        }
+      }
+    }
+  }else{
+    let p=basePrice;
+    let v=0;
+    const seedCount=CFG.pastSec*20;
+    const seedInterval=CFG.pastSec*1000/seedCount;
+    const maxSeedDrift=basePrice*0.003;
 
-  for(let i=seedCount;i>=0;i--){
-    const u1=Math.random(),u2=Math.random();
-    const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
-    v=v*0.7+g*3; // ~$3 noise per tick
-    v=Math.max(-12,Math.min(12,v));
-    p+=v;
-    p+=(basePrice-p)*0.003;
-    p=Math.max(basePrice-maxSeedDrift,Math.min(basePrice+maxSeedDrift,p));
-    S.ph.push({t:n-i*seedInterval,p});
+    for(let i=seedCount;i>=0;i--){
+      const u1=Math.random(),u2=Math.random();
+      const g=Math.sqrt(-2*Math.log(Math.max(u1,0.0001)))*Math.cos(2*Math.PI*u2);
+      v=v*0.7+g*3;
+      v=Math.max(-12,Math.min(12,v));
+      p+=v;
+      p+=(basePrice-p)*0.003;
+      p=Math.max(basePrice-maxSeedDrift,Math.min(basePrice+maxSeedDrift,p));
+      S.ph.push({t:n-i*seedInterval,p});
+    }
+    if(S.ph.length>0)S.ph[S.ph.length-1].p=basePrice;
   }
-  if(S.ph.length>0)S.ph[S.ph.length-1].p=basePrice;
+
   S.cp=basePrice;S.displayPrice=basePrice;S.targetPrice=basePrice;
   updateRange();
   S.pMin=S.targetPMin;S.pMax=S.targetPMax;
 
-  // Update UI
   document.getElementById('hP').textContent='$'+basePrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   updateStatusUI();
+  updateRankUI();
   draw();loop();
 }
 
