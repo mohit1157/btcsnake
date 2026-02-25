@@ -805,14 +805,16 @@ function drawLine(){
   const pts=S.ph;if(pts.length<3)return;
 
   const now=Date.now();
+  // Build visible points with minimum pixel spacing to prevent spline shimmer
   const visible=[];
+  let lastX=-999;
   for(let i=0;i<pts.length;i++){
     const x=t2x(pts[i].t);
     if(x<-50)continue;if(x>S.cw+50)break;
-    const age=now-pts[i].t;
-    if(age<5000||i%2===0&&age<20000||i%4===0){
-      visible.push(pts[i]);
-    }
+    // Enforce minimum 2px spacing between points (except always keep last point)
+    if(x-lastX<2&&i<pts.length-1)continue;
+    visible.push(pts[i]);
+    lastX=x;
   }
   if(visible.length<3)return;
 
@@ -1005,6 +1007,8 @@ function checkT(){
     let el=now-tgt.at;
     if(tgt._frozenAccum)el-=tgt._frozenAccum;
     if(el>CFG.targetLife*1000){resolveT(tgt,false);return}
+    // Only hittable when the snake head has reached the target's time (within 2s window)
+    if(tgt.t>now+2000)return;
     if(Math.abs(S.cp-tgt.p)<=thresh){
       resolveT(tgt,true);
     }
