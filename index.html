@@ -205,13 +205,13 @@ const SFX={
 // 2. SCREEN SHAKE
 // ══════════════════════════════════════
 function triggerShake(intensity){
-  S.shake.intensity=Math.max(S.shake.intensity,intensity);
+  S.shake.intensity=Math.max(S.shake.intensity,Math.min(intensity*0.4,3));
 }
 function updateShake(){
   if(S.shake.intensity>0.1){
-    S.shake.x=(Math.random()-0.5)*S.shake.intensity*2;
-    S.shake.y=(Math.random()-0.5)*S.shake.intensity*2;
-    S.shake.intensity*=0.85; // rapid decay
+    S.shake.x=(Math.random()-0.5)*S.shake.intensity;
+    S.shake.y=(Math.random()-0.5)*S.shake.intensity;
+    S.shake.intensity*=0.72; // fast decay
   }else{
     S.shake.x=0;S.shake.y=0;S.shake.intensity=0;
   }
@@ -838,7 +838,14 @@ function drawLine(){
     X.stroke();X.restore();
   }
 
-  const tipPts=sc.slice(Math.max(0,splitIdx-1));
+  const rawTip=sc.slice(Math.max(0,splitIdx-1));
+  // Smooth tip Y values with a trailing moving average to eliminate shimmer
+  const tipPts=rawTip.map((p,i)=>{
+    if(i===0)return p; // keep junction point exact for continuity with historical line
+    const w=9,s=Math.max(0,i-w+1);
+    const sl=rawTip.slice(s,i+1);
+    return{x:p.x,y:sl.reduce((a,pt)=>a+pt.y,0)/sl.length};
+  });
   if(tipPts.length>=2){
     X.beginPath();
     drawCatmullRomPath(tipPts);
